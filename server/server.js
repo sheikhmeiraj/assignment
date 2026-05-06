@@ -21,10 +21,12 @@ const corsOptions = {
     if (!origin || allowed.length === 0 || allowed.includes(origin)) {
       callback(null, true);
     } else {
-      callback(null, false);
+      callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 };
 
 // If FRONTEND_URL unset, reflect request origin so local dev works out of the box
@@ -33,6 +35,7 @@ if (!(process.env.FRONTEND_URL || '').trim()) {
 }
 
 app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(express.json());
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
